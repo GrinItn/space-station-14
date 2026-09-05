@@ -88,25 +88,42 @@ public sealed class CrewMonitoringConsoleSystem : EntitySystem
 
         foreach (var (address, sensor) in sensors)
         {
-            var jobLower = sensor.Job.ToLower().Trim();
-            var nameLower = sensor.Name.ToLower().Trim();
+            var protoLower = (sensor.JobPrototypeId ?? string.Empty).ToLower().Trim();
+            var jobLower = (sensor.Job ?? string.Empty).ToLower().Trim();
+            var nameLower = (sensor.Name ?? string.Empty).ToLower().Trim();
 
-            if (jobLower == "н/д" || nameLower == "неизвестно" || string.IsNullOrWhiteSpace(sensor.Job))
+            if (string.IsNullOrWhiteSpace(protoLower))
             {
-                filtered.Add(address, sensor);
+                if (nameLower == "неизвестно" ||
+                    nameLower == "unknown" ||
+                    jobLower == "н/д" ||
+                    string.IsNullOrWhiteSpace(jobLower) ||
+                    jobLower.Contains("капитан") ||
+                    jobLower.Contains("глава персонала") ||
+                    jobLower.Contains("представитель нанотрейзен") ||
+                    jobLower.Contains("старший инженер") ||
+                    jobLower.Contains("главный врач") ||
+                    jobLower.Contains("глава службы безопасности") ||
+                    jobLower.Contains("квартирмейстер") ||
+                    jobLower.Contains("научный руководитель") ||
+                    jobLower.Contains("синий щит") ||
+                    jobLower.Contains("врио") ||
+                    jobLower.Contains("acting"))
+                {
+                    filtered.Add(address, sensor);
+                }
                 continue;
             }
 
-            if (jobLower.Contains("капитан") ||
-                jobLower.Contains("глава персонала") ||
-                jobLower.Contains("представитель нанотрейзен") ||
-                jobLower.Contains("старший инженер") ||
-                jobLower.Contains("главный врач") ||
-                jobLower.Contains("глава службы безопасности") ||
-                jobLower.Contains("квартирмейстер") ||
-                jobLower.Contains("научный руководитель") ||
-                jobLower.Contains("синий щит") ||
-                jobLower.Contains("врио"))
+            if (protoLower == "captain" ||
+                protoLower == "headofpersonnel" ||
+                protoLower == "chiefengineer" ||
+                protoLower == "chiefmedicalofficer" ||
+                protoLower == "headofsecurity" ||
+                protoLower == "quartermaster" ||
+                protoLower == "researchdirector" ||
+                protoLower == "blueshield" ||
+                protoLower == "centralcommandofficial")
             {
                 filtered.Add(address, sensor);
             }

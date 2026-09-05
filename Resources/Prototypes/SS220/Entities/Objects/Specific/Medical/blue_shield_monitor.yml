@@ -28,8 +28,8 @@
   - type: PowerCellDraw
     drawRate: 1 
 
-  - type: EntityTableContainerFill
-    containers:
-      cell_slot: !type:AllSelector
-        children:
-        - id: PowerCellHigh
+  - type: ItemSlots
+    slots:
+      cell_slot:
+        name: power-cell-slot-component-slot-name-default
+        startingItem: PowerCellHigh

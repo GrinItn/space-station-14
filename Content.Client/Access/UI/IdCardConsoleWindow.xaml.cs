@@ -282,12 +282,27 @@ namespace Content.Client.Access.UI
 
             var fullNameSafe = FullNameLineEdit.Text.Replace("[", "(").Replace("]", ")"); //ss220 format name fix start
             var jobTitleSafe = JobTitleLineEdit.Text.Replace("[", "(").Replace("]", ")"); //ss220 format name fix start
+            //SS220-new-feature begin
+
+            // If job didn't change, send the current value instead of null —
+            // otherwise the server overwrites the card's existing JobPrototype with null.
+            ProtoId<JobPrototype>? jobProtoToSend = null;
+            if (jobProtoDirty)
+            {
+                jobProtoToSend = new ProtoId<JobPrototype>(_jobPrototypeIds[JobPresetOptionButton.SelectedId]);
+            }
+            else if (_lastJobProto != null)
+            {
+                jobProtoToSend = new ProtoId<JobPrototype>(_lastJobProto);
+            }
+            //SS220-new-feature end
 
             _owner.SubmitData(
                 fullNameSafe, //ss220 format name fix
                 jobTitleSafe, //ss220 format name fix
                 _accessButtons.ButtonsList.Where(x => x.Value.Pressed).Select(x => x.Key).ToList(),
-                jobProtoDirty ? _jobPrototypeIds[JobPresetOptionButton.SelectedId] : null);
+                jobProtoToSend);
+            //SS220-new-feature
         }
     }
 }

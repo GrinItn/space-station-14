@@ -99,7 +99,6 @@ public abstract class SharedSuitSensorSystem : EntitySystem
         ent.Comp.NextUpdate = _timing.CurTime;
         Dirty(ent);
     }
-
     private void OnPlayerSpawn(PlayerSpawnCompleteEvent ev)
     {
         // If the player spawns in arrivals then the grid underneath them may not be appropriate.
@@ -348,7 +347,6 @@ public abstract class SharedSuitSensorSystem : EntitySystem
                 SetSensor((item, sensorComp), mode);
         }
     }
-
     /// <summary>
     /// Attempts to get full <see cref="SuitSensorStatus"/> from the <see cref="SuitSensorComponent"/>
     /// </summary>
@@ -369,6 +367,9 @@ public abstract class SharedSuitSensorSystem : EntitySystem
         // try to get mobs id from ID slot
         var userName = Loc.GetString("suit-sensor-component-unknown-name");
         var userJob = Loc.GetString("suit-sensor-component-unknown-job");
+        //SS220-new-feature begin
+        var userJobPrototypeId = string.Empty;
+        //SS220-new-feature end
         var userJobIcon = "JobIconNoId";
         var userJobDepartments = new List<string>();
 
@@ -378,6 +379,10 @@ public abstract class SharedSuitSensorSystem : EntitySystem
                 userName = card.Comp.FullName;
             if (card.Comp.LocalizedJobTitle != null)
                 userJob = card.Comp.LocalizedJobTitle;
+            //SS220-new-feature begin
+            if (card.Comp.JobPrototype != null)
+                userJobPrototypeId = card.Comp.JobPrototype;
+            //SS220-new-feature end
             userJobIcon = card.Comp.JobIcon;
 
             foreach (var department in card.Comp.JobDepartments)
@@ -398,7 +403,9 @@ public abstract class SharedSuitSensorSystem : EntitySystem
             totalDamageThreshold = critThreshold.Value.Int();
 
         // finally, form suit sensor status
-        var status = new SuitSensorStatus(GetNetEntity(sensor.User.Value), GetNetEntity(ent.Owner), userName, userJob, userJobIcon, userJobDepartments);
+        //SS220-new-feature begin
+        var status = new SuitSensorStatus(GetNetEntity(sensor.User.Value), GetNetEntity(ent.Owner), userName, userJob, userJobIcon, userJobDepartments, userJobPrototypeId);
+        //SS220-new-feature end
         switch (sensor.Mode)
         {
             case SuitSensorMode.SensorBinary:
@@ -448,6 +455,9 @@ public abstract class SharedSuitSensorSystem : EntitySystem
             [DeviceNetworkConstants.Command] = DeviceNetworkConstants.CmdUpdatedState,
             [SuitSensorConstants.NET_NAME] = status.Name,
             [SuitSensorConstants.NET_JOB] = status.Job,
+            //SS220-new-feature begin
+            [SuitSensorConstants.NET_JOB_PROTOTYPE_ID] = status.JobPrototypeId,
+            //SS220-new-feature end
             [SuitSensorConstants.NET_JOB_ICON] = status.JobIcon,
             [SuitSensorConstants.NET_JOB_DEPARTMENTS] = status.JobDepartments,
             [SuitSensorConstants.NET_IS_ALIVE] = status.IsAlive,
@@ -479,6 +489,9 @@ public abstract class SharedSuitSensorSystem : EntitySystem
         // check name, job and alive
         if (!payload.TryGetValue(SuitSensorConstants.NET_NAME, out string? name)) return null;
         if (!payload.TryGetValue(SuitSensorConstants.NET_JOB, out string? job)) return null;
+        //SS220-new-feature begin
+        if (!payload.TryGetValue(SuitSensorConstants.NET_JOB_PROTOTYPE_ID, out string? jobPrototypeId)) return null;
+        //SS220-new-feature end
         if (!payload.TryGetValue(SuitSensorConstants.NET_JOB_ICON, out string? jobIcon)) return null;
         if (!payload.TryGetValue(SuitSensorConstants.NET_JOB_DEPARTMENTS, out List<string>? jobDepartments)) return null;
         if (!payload.TryGetValue(SuitSensorConstants.NET_IS_ALIVE, out bool? isAlive)) return null;
@@ -490,13 +503,15 @@ public abstract class SharedSuitSensorSystem : EntitySystem
         payload.TryGetValue(SuitSensorConstants.NET_TOTAL_DAMAGE_THRESHOLD, out int? totalDamageThreshold);
         payload.TryGetValue(SuitSensorConstants.NET_COORDINATES, out NetCoordinates? coords);
 
-        var status = new SuitSensorStatus(ownerUid, suitSensorUid, name, job, jobIcon, jobDepartments)
+        //SS220-new-feature begin
+        var status = new SuitSensorStatus(ownerUid, suitSensorUid, name, job, jobIcon, jobDepartments, jobPrototypeId)
         {
             IsAlive = isAlive.Value,
             TotalDamage = totalDamage,
             TotalDamageThreshold = totalDamageThreshold,
             Coordinates = coords,
         };
+        //SS220-new-feature end
         return status;
     }
 }

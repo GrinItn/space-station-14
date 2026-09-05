@@ -7,7 +7,7 @@ namespace Content.Shared.Medical.SuitSensor;
 [Serializable, NetSerializable]
 public sealed class SuitSensorStatus
 {
-    public SuitSensorStatus(NetEntity ownerUid, NetEntity suitSensorUid, string name, string job, string jobIcon, List<string> jobDepartments)
+    public SuitSensorStatus(NetEntity ownerUid, NetEntity suitSensorUid, string name, string job, string jobIcon, List<string> jobDepartments, string jobPrototypeId)
     {
         OwnerUid = ownerUid;
         SuitSensorUid = suitSensorUid;
@@ -15,6 +15,9 @@ public sealed class SuitSensorStatus
         Job = job;
         JobIcon = jobIcon;
         JobDepartments = jobDepartments;
+        //SS220-new-feature begin
+        JobPrototypeId = jobPrototypeId;
+        //SS220-new-feature end
     }
 
     public TimeSpan Timestamp;
@@ -22,12 +25,18 @@ public sealed class SuitSensorStatus
     public NetEntity OwnerUid;
     public string Name;
     public string Job;
+    //SS220-new-feature begin
+    /// <summary>
+    ///     The unlocalized job prototype ID of the person wearing the sensor. Used for server-side filtration.
+    /// </summary>
+    public string JobPrototypeId;
+    //SS220-new-feature end
     public string JobIcon;
     public List<string> JobDepartments;
     public bool IsAlive;
     public int? TotalDamage;
     public int? TotalDamageThreshold;
-    public float? DamagePercentage => TotalDamageThreshold == null || TotalDamage == null ? null : TotalDamage / (float) TotalDamageThreshold;
+    public float? DamagePercentage => TotalDamageThreshold == null || TotalDamage == null ? null : TotalDamage / (float)TotalDamageThreshold;
     public NetCoordinates? Coordinates;
 }
 
@@ -60,6 +69,9 @@ public static class SuitSensorConstants
     public const string NET_OWNER_UID = "ownerUid";
     public const string NET_NAME = "name";
     public const string NET_JOB = "job";
+    //SS220-new-feature begin
+    public const string NET_JOB_PROTOTYPE_ID = "jobPrototypeId";
+    //SS220-new-feature end
     public const string NET_JOB_ICON = "jobIcon";
     public const string NET_JOB_DEPARTMENTS = "jobDepartments";
     public const string NET_IS_ALIVE = "alive";

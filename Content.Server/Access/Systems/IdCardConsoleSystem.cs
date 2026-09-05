@@ -172,12 +172,20 @@ public sealed class IdCardConsoleSystem : SharedIdCardConsoleSystem
         }
 
         UpdateStationRecord(uid, targetId, newFullName, newJobTitle, job);
+        //SS220-new-feature begin
+        // Only write JobPrototype if the client actually sent a value —
+        // do NOT overwrite an existing one with null when only the name changed.
+        //SS220-new-feature end
         if ((!TryComp<StationRecordKeyStorageComponent>(targetId, out var keyStorage)
             || keyStorage.Key is not { } key
             || !_record.TryGetRecord<GeneralStationRecord>(key, out _))
-            && newJobProto != string.Empty)
+        //SS220-new-feature begin
+            && newJobProto != string.Empty
+            && newJobProto.HasValue)
+        //SS220-new-feature end
         {
-            Comp<IdCardComponent>(targetId).JobPrototype = newJobProto;
+            Comp<IdCardComponent>(targetId).JobPrototype = newJobProto.Value;
+            //SS220-new-feature
         }
 
         if (!newAccessList.TrueForAll(x => component.AccessLevels.Contains(x)))
