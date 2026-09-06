@@ -1,3 +1,4 @@
+using Content.Server.Access.Components;
 using Content.Server.DeviceNetwork.Systems;
 using Content.Server.Medical.CrewMonitoring;
 using Content.Shared.DeviceNetwork.Components;
@@ -37,6 +38,11 @@ public sealed class SuitSensorSystem : SharedSuitSensorSystem
             if (status == null)
                 continue;
 
+            // Check if the ID card is an Agent ID card
+            //SS220-new-feature begin
+            status.IsAgentIdCard = CheckAgentIdCard(sensor.User);
+            //SS220-new-feature end
+
             //Retrieve active server address if the sensor isn't connected to a server
             if (sensor.ConnectedServer == null)
             {
@@ -59,4 +65,29 @@ public sealed class SuitSensorSystem : SharedSuitSensorSystem
             _deviceNetworkSystem.QueuePacket(uid, sensor.ConnectedServer, payload, device: device);
         }
     }
+
+    //SS220-new-feature begin
+    /// <summary>
+    ///     Checks if the user of the sensor is wearing an Agent ID card.
+    ///     Returns true if the ID card entity has an AgentIDCardComponent.
+    /// </summary>
+    private bool CheckAgentIdCard(EntityUid? userUid)
+    {
+        if (userUid == null || !userUid.HasValue)
+            return false;
+
+        var uid = userUid.Value;
+
+        // Find the ID card (hands, entity, or inventory "id" slot)
+        var idCardSys = EntityManager.System<Content.Shared.Access.Systems.SharedIdCardSystem>();
+        if (idCardSys.TryFindIdCard(uid, out var card))
+        {
+            // Check if the card entity has AgentIDCardComponent
+            if (TryComp<AgentIDCardComponent>(card.Owner, out _))
+                return true;
+        }
+
+        return false;
+    }
+    //SS220-new-feature end
 }

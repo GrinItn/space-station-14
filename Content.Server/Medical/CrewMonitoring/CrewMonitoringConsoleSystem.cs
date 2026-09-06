@@ -95,6 +95,22 @@ public sealed class CrewMonitoringConsoleSystem : EntitySystem
         "nanotrasenrepresentative",
     };
 
+    /// <summary>
+    /// Job icon prototype IDs for HighClearance roles. Used to detect agents using chameleon to disguise as heads.
+    /// </summary>
+    private static readonly HashSet<string> HighClearanceIcons = new()
+    {
+        "JobIconCaptain",
+        "JobIconHeadOfPersonnel",
+        "JobIconChiefMedicalOfficer",
+        "JobIconHeadOfSecurity",
+        "JobIconQuarterMaster",
+        "JobIconResearchDirector",
+        "JobIconBlueShield",
+        "JobIconNanotrasen",
+        "JobIconChiefEngineer",
+    };
+
     private Dictionary<string, SuitSensorStatus> FilterBlueShieldSensors(Dictionary<string, SuitSensorStatus> sensors)
     {
         var filtered = new Dictionary<string, SuitSensorStatus>();
@@ -102,20 +118,29 @@ public sealed class CrewMonitoringConsoleSystem : EntitySystem
         foreach (var (address, sensor) in sensors)
         {
             var protoLower = sensor.JobPrototypeId?.ToLower().Trim() ?? string.Empty;
-            var jobLower = sensor.Job?.ToLower().Trim() ?? string.Empty;
 
-            // Show only in two cases:
-            // 1. Real system ID is in HighClearanceProtos (high-ranking personnel).
-            // 2. Both system ID and displayed job are empty — truly unidentified person.
-            // Everyone else (including disguised agents with Agent ID cards) is hidden.
+            // Show only in three cases:
+            // 1. Genuine high-ranking personnel (real ID card with JobPrototypeId in HighClearanceProtos).
+            // 2. Agent disguised as a head (IsAgentIdCard = true AND JobIcon matches a HighClearance icon).
+            // 3. Unknown person — JobIcon is "JobIconNoId" (no ID card at all).
             if (HighClearanceProtos.Contains(protoLower))
             {
+                // Genuine high-ranking personnel with a real ID card.
                 filtered.Add(address, sensor);
             }
-            else if (string.IsNullOrWhiteSpace(protoLower) && string.IsNullOrWhiteSpace(jobLower))
+            else if (sensor.IsAgentIdCard && HighClearanceIcons.Contains(sensor.JobIcon))
             {
+                // Agent ID card disguised as a head via chameleon — show them.
                 filtered.Add(address, sensor);
             }
+            else if (sensor.JobIcon == "JobIconNoId")
+            {
+                // Unknown person with no ID card.
+                filtered.Add(address, sensor);
+            }
+            // Everyone else is hidden:
+            // - Agents disguised as regular crew (IsAgentIdCard = true but JobIcon is not HighClearance).
+            // - Regular crew members (no JobPrototypeId in HighClearanceProtos, not an Agent ID card).
         }
 
         return filtered;

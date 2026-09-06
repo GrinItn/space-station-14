@@ -7,7 +7,7 @@ namespace Content.Shared.Medical.SuitSensor;
 [Serializable, NetSerializable]
 public sealed class SuitSensorStatus
 {
-    public SuitSensorStatus(NetEntity ownerUid, NetEntity suitSensorUid, string name, string job, string jobIcon, List<string> jobDepartments, string jobPrototypeId)
+    public SuitSensorStatus(NetEntity ownerUid, NetEntity suitSensorUid, string name, string job, string jobIcon, List<string> jobDepartments, string jobPrototypeId, bool isAgentIdCard = false)
     {
         OwnerUid = ownerUid;
         SuitSensorUid = suitSensorUid;
@@ -17,6 +17,7 @@ public sealed class SuitSensorStatus
         JobDepartments = jobDepartments;
         //SS220-new-feature begin
         JobPrototypeId = jobPrototypeId;
+        IsAgentIdCard = isAgentIdCard;
         //SS220-new-feature end
     }
 
@@ -30,6 +31,10 @@ public sealed class SuitSensorStatus
     ///     The unlocalized job prototype ID of the person wearing the sensor. Used for server-side filtration.
     /// </summary>
     public string JobPrototypeId;
+    /// <summary>
+    ///     True if the ID card worn by the person is an Agent ID card. Used to filter out disguised agents.
+    /// </summary>
+    public bool IsAgentIdCard;
     //SS220-new-feature end
     public string JobIcon;
     public List<string> JobDepartments;
@@ -71,6 +76,7 @@ public static class SuitSensorConstants
     public const string NET_JOB = "job";
     //SS220-new-feature begin
     public const string NET_JOB_PROTOTYPE_ID = "jobPrototypeId";
+    public const string NET_IS_AGENT_ID_CARD = "isAgentIdCard";
     //SS220-new-feature end
     public const string NET_JOB_ICON = "jobIcon";
     public const string NET_JOB_DEPARTMENTS = "jobDepartments";

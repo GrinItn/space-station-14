@@ -457,6 +457,7 @@ public abstract class SharedSuitSensorSystem : EntitySystem
             [SuitSensorConstants.NET_JOB] = status.Job,
             //SS220-new-feature begin
             [SuitSensorConstants.NET_JOB_PROTOTYPE_ID] = status.JobPrototypeId,
+            [SuitSensorConstants.NET_IS_AGENT_ID_CARD] = status.IsAgentIdCard,
             //SS220-new-feature end
             [SuitSensorConstants.NET_JOB_ICON] = status.JobIcon,
             [SuitSensorConstants.NET_JOB_DEPARTMENTS] = status.JobDepartments,
@@ -491,6 +492,8 @@ public abstract class SharedSuitSensorSystem : EntitySystem
         if (!payload.TryGetValue(SuitSensorConstants.NET_JOB, out string? job)) return null;
         //SS220-new-feature begin
         if (!payload.TryGetValue(SuitSensorConstants.NET_JOB_PROTOTYPE_ID, out string? jobPrototypeId)) return null;
+        bool isAgentIdCard = false;
+        payload.TryGetValue(SuitSensorConstants.NET_IS_AGENT_ID_CARD, out isAgentIdCard);
         //SS220-new-feature end
         if (!payload.TryGetValue(SuitSensorConstants.NET_JOB_ICON, out string? jobIcon)) return null;
         if (!payload.TryGetValue(SuitSensorConstants.NET_JOB_DEPARTMENTS, out List<string>? jobDepartments)) return null;
@@ -504,7 +507,7 @@ public abstract class SharedSuitSensorSystem : EntitySystem
         payload.TryGetValue(SuitSensorConstants.NET_COORDINATES, out NetCoordinates? coords);
 
         //SS220-new-feature begin
-        var status = new SuitSensorStatus(ownerUid, suitSensorUid, name, job, jobIcon, jobDepartments, jobPrototypeId)
+        var status = new SuitSensorStatus(ownerUid, suitSensorUid, name, job, jobIcon, jobDepartments, jobPrototypeId, isAgentIdCard)
         {
             IsAlive = isAlive.Value,
             TotalDamage = totalDamage,
