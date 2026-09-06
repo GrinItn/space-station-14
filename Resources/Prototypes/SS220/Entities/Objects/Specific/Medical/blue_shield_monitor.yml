@@ -1,8 +1,6 @@
 - type: entity
   id: HandheldBlueShieldMonitor
   parent: HandheldCrewMonitor
-  name: "{ ent-HandheldBlueShieldMonitor }"
-  description: "{ ent-HandheldBlueShieldMonitor.desc }"
   components:
   - type: BlueShieldMonitor
   - type: Sprite
