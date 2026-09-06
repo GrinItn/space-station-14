@@ -102,9 +102,17 @@ public sealed class CrewMonitoringConsoleSystem : EntitySystem
         foreach (var (address, sensor) in sensors)
         {
             var protoLower = sensor.JobPrototypeId?.ToLower().Trim() ?? string.Empty;
+            var jobLower = sensor.Job?.ToLower().Trim() ?? string.Empty;
 
-            // Unknown persons (no ID card or undefined job) — always visible to Blue Shield.
-            if (string.IsNullOrWhiteSpace(protoLower) || HighClearanceProtos.Contains(protoLower))
+            // Show only in two cases:
+            // 1. Real system ID is in HighClearanceProtos (high-ranking personnel).
+            // 2. Both system ID and displayed job are empty — truly unidentified person.
+            // Everyone else (including disguised agents with Agent ID cards) is hidden.
+            if (HighClearanceProtos.Contains(protoLower))
+            {
+                filtered.Add(address, sensor);
+            }
+            else if (string.IsNullOrWhiteSpace(protoLower) && string.IsNullOrWhiteSpace(jobLower))
             {
                 filtered.Add(address, sensor);
             }
