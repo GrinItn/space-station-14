@@ -82,48 +82,29 @@ public sealed class CrewMonitoringConsoleSystem : EntitySystem
     }
 
     //SS220-new-feature begin
+    private static readonly HashSet<string> HighClearanceProtos = new()
+    {
+        "captain",
+        "headofpersonnel",
+        "chiefengineer",
+        "chiefmedicalofficer",
+        "headofsecurity",
+        "quartermaster",
+        "researchdirector",
+        "blueshield",
+        "nanotrasenrepresentative",
+    };
+
     private Dictionary<string, SuitSensorStatus> FilterBlueShieldSensors(Dictionary<string, SuitSensorStatus> sensors)
     {
         var filtered = new Dictionary<string, SuitSensorStatus>();
 
         foreach (var (address, sensor) in sensors)
         {
-            var protoLower = (sensor.JobPrototypeId ?? string.Empty).ToLower().Trim();
-            var jobLower = (sensor.Job ?? string.Empty).ToLower().Trim();
-            var nameLower = (sensor.Name ?? string.Empty).ToLower().Trim();
+            var protoLower = sensor.JobPrototypeId?.ToLower().Trim() ?? string.Empty;
 
-            if (string.IsNullOrWhiteSpace(protoLower))
-            {
-                if (nameLower == "неизвестно" ||
-                    nameLower == "unknown" ||
-                    jobLower == "н/д" ||
-                    string.IsNullOrWhiteSpace(jobLower) ||
-                    jobLower.Contains("капитан") ||
-                    jobLower.Contains("глава персонала") ||
-                    jobLower.Contains("представитель нанотрейзен") ||
-                    jobLower.Contains("старший инженер") ||
-                    jobLower.Contains("главный врач") ||
-                    jobLower.Contains("глава службы безопасности") ||
-                    jobLower.Contains("квартирмейстер") ||
-                    jobLower.Contains("научный руководитель") ||
-                    jobLower.Contains("синий щит") ||
-                    jobLower.Contains("врио") ||
-                    jobLower.Contains("acting"))
-                {
-                    filtered.Add(address, sensor);
-                }
-                continue;
-            }
-
-            if (protoLower == "captain" ||
-                protoLower == "headofpersonnel" ||
-                protoLower == "chiefengineer" ||
-                protoLower == "chiefmedicalofficer" ||
-                protoLower == "headofsecurity" ||
-                protoLower == "quartermaster" ||
-                protoLower == "researchdirector" ||
-                protoLower == "blueshield" ||
-                protoLower == "centralcommandofficial")
+            // Unknown persons (no ID card or undefined job) — always visible to Blue Shield.
+            if (string.IsNullOrWhiteSpace(protoLower) || HighClearanceProtos.Contains(protoLower))
             {
                 filtered.Add(address, sensor);
             }
