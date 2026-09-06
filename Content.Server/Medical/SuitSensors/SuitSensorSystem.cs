@@ -1,6 +1,7 @@
 using Content.Server.Access.Components;
 using Content.Server.DeviceNetwork.Systems;
 using Content.Server.Medical.CrewMonitoring;
+using Content.Shared.Access.Systems;
 using Content.Shared.DeviceNetwork.Components;
 using Content.Shared.Medical.SuitSensors;
 using Robust.Shared.Timing;
@@ -12,6 +13,7 @@ public sealed class SuitSensorSystem : SharedSuitSensorSystem
     [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly DeviceNetworkSystem _deviceNetworkSystem = default!;
     [Dependency] private readonly SingletonDeviceNetServerSystem _singletonServerSystem = default!;
+    [Dependency] private readonly SharedIdCardSystem _idCardSystem = default!; //SS220-new-feature
 
     public override void Update(float frameTime)
     {
@@ -39,9 +41,7 @@ public sealed class SuitSensorSystem : SharedSuitSensorSystem
                 continue;
 
             // Check if the ID card is an Agent ID card
-            //SS220-new-feature begin
-            status.IsAgentIdCard = CheckAgentIdCard(sensor.User);
-            //SS220-new-feature end
+            status.IsAgentIdCard = CheckAgentIdCard(sensor.User); //SS220-new-feature
 
             //Retrieve active server address if the sensor isn't connected to a server
             if (sensor.ConnectedServer == null)
@@ -79,8 +79,7 @@ public sealed class SuitSensorSystem : SharedSuitSensorSystem
         var uid = userUid.Value;
 
         // Find the ID card (hands, entity, or inventory "id" slot)
-        var idCardSys = EntityManager.System<Content.Shared.Access.Systems.SharedIdCardSystem>();
-        if (idCardSys.TryFindIdCard(uid, out var card))
+        if (_idCardSystem.TryFindIdCard(uid, out var card)) //SS220-new-feature
         {
             // Check if the card entity has AgentIDCardComponent
             if (TryComp<AgentIDCardComponent>(card.Owner, out _))

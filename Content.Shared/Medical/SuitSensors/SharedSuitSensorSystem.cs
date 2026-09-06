@@ -367,9 +367,7 @@ public abstract class SharedSuitSensorSystem : EntitySystem
         // try to get mobs id from ID slot
         var userName = Loc.GetString("suit-sensor-component-unknown-name");
         var userJob = Loc.GetString("suit-sensor-component-unknown-job");
-        //SS220-new-feature begin
-        var userJobPrototypeId = string.Empty;
-        //SS220-new-feature end
+        var userJobPrototypeId = string.Empty; //SS220-new-feature
         var userJobIcon = "JobIconNoId";
         var userJobDepartments = new List<string>();
 
@@ -403,9 +401,7 @@ public abstract class SharedSuitSensorSystem : EntitySystem
             totalDamageThreshold = critThreshold.Value.Int();
 
         // finally, form suit sensor status
-        //SS220-new-feature begin
-        var status = new SuitSensorStatus(GetNetEntity(sensor.User.Value), GetNetEntity(ent.Owner), userName, userJob, userJobIcon, userJobDepartments, userJobPrototypeId);
-        //SS220-new-feature end
+        var status = new SuitSensorStatus(GetNetEntity(sensor.User.Value), GetNetEntity(ent.Owner), userName, userJob, userJobIcon, userJobDepartments, userJobPrototypeId); //SS220-new-feature
         switch (sensor.Mode)
         {
             case SuitSensorMode.SensorBinary:

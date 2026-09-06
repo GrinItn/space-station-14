@@ -29,6 +29,8 @@ public sealed class SuitSensorStatus
     //SS220-new-feature begin
     /// <summary>
     ///     The unlocalized job prototype ID of the person wearing the sensor. Used for server-side filtration.
+    ///     Empty string when the ID card has no JobPrototype (e.g. no ID card at all).
+    ///     Must NOT be null: NetworkPayload.TryGetValue&lt;string&gt; fails on null values and drops the whole packet.
     /// </summary>
     public string JobPrototypeId;
     /// <summary>

@@ -175,6 +175,8 @@ public sealed class IdCardConsoleSystem : SharedIdCardConsoleSystem
         //SS220-new-feature begin
         // Only write JobPrototype if the client actually sent a value —
         // do NOT overwrite an existing one with null when only the name changed.
+        // The != string.Empty check guards against the client sending an empty ProtoId
+        // for cards that have no JobPrototype (UI state sends string.Empty in that case).
         //SS220-new-feature end
         if ((!TryComp<StationRecordKeyStorageComponent>(targetId, out var keyStorage)
             || keyStorage.Key is not { } key
@@ -184,8 +186,7 @@ public sealed class IdCardConsoleSystem : SharedIdCardConsoleSystem
             && newJobProto.HasValue)
         //SS220-new-feature end
         {
-            Comp<IdCardComponent>(targetId).JobPrototype = newJobProto.Value;
-            //SS220-new-feature
+            Comp<IdCardComponent>(targetId).JobPrototype = newJobProto.Value; //SS220-new-feature
         }
 
         if (!newAccessList.TrueForAll(x => component.AccessLevels.Contains(x)))
