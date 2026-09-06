@@ -1,6 +1,8 @@
 - type: entity
   id: HandheldBlueShieldMonitor
   parent: HandheldCrewMonitor
+  name: handheld Blue Shield monitor
+  description: A handheld crew monitor, hardware-locked to track the vitals of the station's command staff and unidentified individuals without ID-cards.
   components:
   - type: BlueShieldMonitor
   - type: Sprite
