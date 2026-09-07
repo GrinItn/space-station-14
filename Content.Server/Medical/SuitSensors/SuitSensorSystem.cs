@@ -76,17 +76,12 @@ public sealed class SuitSensorSystem : SharedSuitSensorSystem
         if (userUid == null || !userUid.HasValue)
             return false;
 
-        var uid = userUid.Value;
-
         // Find the ID card (hands, entity, or inventory "id" slot)
-        if (_idCardSystem.TryFindIdCard(uid, out var card)) //SS220-new-feature
-        {
-            // Check if the card entity has AgentIDCardComponent
-            if (TryComp<AgentIDCardComponent>(card.Owner, out _))
-                return true;
-        }
+        if (!_idCardSystem.TryFindIdCard(userUid.Value, out var card))
+            return false;
 
-        return false;
+        // Check if the card entity has AgentIDCardComponent
+        return TryComp<AgentIDCardComponent>(card.Owner, out _);
     }
     //SS220-new-feature end
 }
