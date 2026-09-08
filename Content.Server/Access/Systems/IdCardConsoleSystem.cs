@@ -174,16 +174,10 @@ public sealed class IdCardConsoleSystem : SharedIdCardConsoleSystem
         UpdateStationRecord(uid, targetId, newFullName, newJobTitle, job);
         // Only write JobPrototype if the client actually sent a value —
         // do NOT overwrite an existing one with null when only the name changed.
-        // The != string.Empty check guards against the client sending an empty ProtoId
-        // for cards that have no JobPrototype (UI state sends string.Empty in that case).
         //SS220-new-feature begin
-        if ((!TryComp<StationRecordKeyStorageComponent>(targetId, out var keyStorage)
-            || keyStorage.Key is not { } key
-            || !_record.TryGetRecord<GeneralStationRecord>(key, out _))
-            && newJobProto != string.Empty
-            && newJobProto.HasValue)
+        if (newJobProto.HasValue && TryComp<IdCardComponent>(targetId, out var idComp))
         {
-            Comp<IdCardComponent>(targetId).JobPrototype = newJobProto.Value;
+            idComp.JobPrototype = newJobProto.Value;
         }
         //SS220-new-feature end
 
