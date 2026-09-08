@@ -487,9 +487,11 @@ public abstract class SharedSuitSensorSystem : EntitySystem
         if (!payload.TryGetValue(SuitSensorConstants.NET_NAME, out string? name)) return null;
         if (!payload.TryGetValue(SuitSensorConstants.NET_JOB, out string? job)) return null;
         //SS220-new-feature begin
-        if (!payload.TryGetValue(SuitSensorConstants.NET_JOB_PROTOTYPE_ID, out string? jobPrototypeId)) return null;
-        bool isAgentIdCard = false;
-        payload.TryGetValue(SuitSensorConstants.NET_IS_AGENT_ID_CARD, out isAgentIdCard);
+        // Optional fields: packets without them (e.g. from modified sensors) must not drop
+        // the whole status — default safely instead of returning null.
+        payload.TryGetValue(SuitSensorConstants.NET_JOB_PROTOTYPE_ID, out string? jobPrototypeId);
+        jobPrototypeId ??= string.Empty;
+        payload.TryGetValue(SuitSensorConstants.NET_IS_AGENT_ID_CARD, out bool isAgentIdCard);
         //SS220-new-feature end
         if (!payload.TryGetValue(SuitSensorConstants.NET_JOB_ICON, out string? jobIcon)) return null;
         if (!payload.TryGetValue(SuitSensorConstants.NET_JOB_DEPARTMENTS, out List<string>? jobDepartments)) return null;
@@ -505,7 +507,7 @@ public abstract class SharedSuitSensorSystem : EntitySystem
         //SS220-new-feature begin
         var status = new SuitSensorStatus(ownerUid, suitSensorUid, name, job, jobIcon, jobDepartments, jobPrototypeId, isAgentIdCard)
         {
-            IsAlive = isAlive.Value,
+            IsAlive = isAlive ?? false,
             TotalDamage = totalDamage,
             TotalDamageThreshold = totalDamageThreshold,
             Coordinates = coords,

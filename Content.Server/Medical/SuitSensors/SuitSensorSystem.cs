@@ -1,4 +1,4 @@
-using Content.Server.Access.Components;
+using Content.Server.Access.Components; //SS220-new-feature
 using Content.Server.DeviceNetwork.Systems;
 using Content.Server.Medical.CrewMonitoring;
 using Content.Shared.Access.Systems;
@@ -73,11 +73,11 @@ public sealed class SuitSensorSystem : SharedSuitSensorSystem
     /// </summary>
     private bool CheckAgentIdCard(EntityUid? userUid)
     {
-        if (userUid == null || !userUid.HasValue)
+        if (userUid is not { } user)
             return false;
 
         // Find the ID card (hands, entity, or inventory "id" slot)
-        if (!_idCardSystem.TryFindIdCard(userUid.Value, out var card))
+        if (!_idCardSystem.TryFindIdCard(user, out var card))
             return false;
 
         // Check if the card entity has AgentIDCardComponent

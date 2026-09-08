@@ -40,4 +40,16 @@ public sealed partial class BlueShieldMonitorComponent : Component
         "JobIconNanotrasen",
         "JobIconChiefEngineer",
     };
+
+    /// <summary>
+    ///     Job icon prototype IDs treated as "unidentified". Always shown on the Blue Shield monitor.
+    ///     "JobIconNoId" is the fallback icon when a person wears no ID card at all,
+    ///     "JobIconUnknown" is the default icon of a blank ID card.
+    /// </summary>
+    [DataField]
+    public HashSet<string> UnknownJobIcons = new()
+    {
+        "JobIconNoId",
+        "JobIconUnknown",
+    };
 }

@@ -17,10 +17,13 @@ public sealed class BlueShieldMonitorSystem : EntitySystem
     /// </summary>
     public Dictionary<string, SuitSensorStatus> ProcessSensorStatus(EntityUid uid, Dictionary<string, SuitSensorStatus> sensors)
     {
-        if (HasComp<BlueShieldMonitorComponent>(uid))
+        if (TryComp<BlueShieldMonitorComponent>(uid, out var blueShieldMonitor))
         {
-            var comp = Comp<BlueShieldMonitorComponent>(uid);
-            return FilterBlueShieldSensors(sensors, comp.HighClearanceProtos, comp.HighClearanceIcons);
+            return FilterBlueShieldSensors(
+                sensors,
+                blueShieldMonitor.HighClearanceProtos,
+                blueShieldMonitor.HighClearanceIcons,
+                blueShieldMonitor.UnknownJobIcons);
         }
 
         return StripSensitiveSensorData(sensors);
@@ -29,31 +32,26 @@ public sealed class BlueShieldMonitorSystem : EntitySystem
     private Dictionary<string, SuitSensorStatus> FilterBlueShieldSensors(
         Dictionary<string, SuitSensorStatus> sensors,
         HashSet<string> highClearanceProtos,
-        HashSet<string> highClearanceIcons)
+        HashSet<string> highClearanceIcons,
+        HashSet<string> unknownJobIcons)
     {
         var filtered = new Dictionary<string, SuitSensorStatus>();
 
         foreach (var (address, sensor) in sensors)
         {
-            var protoLower = sensor.JobPrototypeId.ToLower().Trim();
+            // ToLowerInvariant: job prototype IDs are ASCII and must not depend on the server locale.
+            var protoLower = sensor.JobPrototypeId.ToLowerInvariant().Trim();
 
-            // Show only in three cases:
+            // Show sensor if any of the following conditions are met:
             // 1. Genuine high-ranking personnel (real ID card with JobPrototypeId in highClearanceProtos).
             // 2. Agent disguised as a head (IsAgentIdCard = true AND JobIcon matches a high clearance icon).
-            // 3. Unknown person — JobIcon is "JobIconNoId" (no ID card at all).
-            if (highClearanceProtos.Contains(protoLower))
+            // 3. Unidentified person — no ID card at all ("JobIconNoId") or a blank ID card ("JobIconUnknown").
+            bool isHighClearance = highClearanceProtos.Contains(protoLower);
+            bool isDisguisedAgent = sensor.IsAgentIdCard && highClearanceIcons.Contains(sensor.JobIcon);
+            bool isUnknown = unknownJobIcons.Contains(sensor.JobIcon);
+
+            if (isHighClearance || isDisguisedAgent || isUnknown)
             {
-                // Genuine high-ranking personnel with a real ID card.
-                filtered.Add(address, sensor);
-            }
-            else if (sensor.IsAgentIdCard && highClearanceIcons.Contains(sensor.JobIcon))
-            {
-                // Agent ID card disguised as a head via chameleon — show them.
-                filtered.Add(address, sensor);
-            }
-            else if (sensor.JobIcon == "JobIconNoId")
-            {
-                // Unknown person with no ID card.
                 filtered.Add(address, sensor);
             }
             // Everyone else is hidden:
