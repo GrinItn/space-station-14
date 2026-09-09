@@ -73,11 +73,11 @@ public sealed class SuitSensorSystem : SharedSuitSensorSystem
     /// </summary>
     private bool CheckAgentIdCard(EntityUid? userUid)
     {
-        if (userUid is not { } user)
+        if (userUid == null || !userUid.HasValue)
             return false;
 
         // Find the ID card (hands, entity, or inventory "id" slot)
-        if (!_idCardSystem.TryFindIdCard(user, out var card))
+        if (!_idCardSystem.TryFindIdCard(userUid.Value, out var card))
             return false;
 
         // Check if the card entity has AgentIDCardComponent
