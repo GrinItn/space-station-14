@@ -1,4 +1,4 @@
-using Content.Server.Access.Components; //SS220-new-feature
+using Content.Server.Access.Components;
 using Content.Server.DeviceNetwork.Systems;
 using Content.Server.Medical.CrewMonitoring;
 using Content.Shared.Access.Systems;

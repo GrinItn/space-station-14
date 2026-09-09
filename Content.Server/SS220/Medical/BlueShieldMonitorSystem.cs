@@ -19,47 +19,47 @@ public sealed class BlueShieldMonitorSystem : EntitySystem
     {
         if (TryComp<BlueShieldMonitorComponent>(uid, out var blueShieldMonitor))
         {
-            return FilterBlueShieldSensors(
-                sensors,
-                blueShieldMonitor.HighClearanceProtos,
-                blueShieldMonitor.HighClearanceIcons,
-                blueShieldMonitor.UnknownJobIcons);
+            return FilterBlueShieldSensors(uid, sensors);
         }
 
         return StripSensitiveSensorData(sensors);
     }
 
     private Dictionary<string, SuitSensorStatus> FilterBlueShieldSensors(
-        Dictionary<string, SuitSensorStatus> sensors,
-        HashSet<string> highClearanceProtos,
-        HashSet<string> highClearanceIcons,
-        HashSet<string> unknownJobIcons)
+        EntityUid monitorUid,
+        Dictionary<string, SuitSensorStatus> sensors)
     {
+        if (!TryComp<BlueShieldMonitorComponent>(monitorUid, out var comp))
+            return new Dictionary<string, SuitSensorStatus>();
+
         var filtered = new Dictionary<string, SuitSensorStatus>();
 
         foreach (var (address, sensor) in sensors)
         {
-            // ToLowerInvariant: job prototype IDs are ASCII and must not depend on the server locale.
             var protoLower = sensor.JobPrototypeId.ToLowerInvariant().Trim();
 
-            // Show sensor if any of the following conditions are met:
-            // 1. Genuine high-ranking personnel (real ID card with JobPrototypeId in highClearanceProtos).
-            // 2. Agent disguised as a head (IsAgentIdCard = true AND JobIcon matches a high clearance icon).
-            // 3. Unidentified person — no ID card at all ("JobIconNoId") or a blank ID card ("JobIconUnknown").
-            bool isHighClearance = highClearanceProtos.Contains(protoLower);
-            bool isDisguisedAgent = sensor.IsAgentIdCard && highClearanceIcons.Contains(sensor.JobIcon);
-            bool isUnknown = unknownJobIcons.Contains(sensor.JobIcon);
-
-            if (isHighClearance || isDisguisedAgent || isUnknown)
+            if (ShouldShowOnBlueShield(comp, sensor, protoLower))
             {
                 filtered.Add(address, sensor);
             }
-            // Everyone else is hidden:
-            // - Agents disguised as regular crew (IsAgentIdCard = true but JobIcon is not high clearance).
-            // - Regular crew members (no JobPrototypeId in highClearanceProtos, not an Agent ID card).
         }
 
         return filtered;
+
+        // Local function keeps the filtering logic encapsulated and readable
+        bool ShouldShowOnBlueShield(BlueShieldMonitorComponent c, SuitSensorStatus s, string jobProto)
+        {
+            // 1. Genuine high-ranking personnel
+            if (c.HighClearanceProtos.Contains(jobProto))
+                return true;
+
+            // 2. Agent disguised as a head (chameleon)
+            if (s.IsAgentIdCard && c.HighClearanceIcons.Contains(s.JobIcon))
+                return true;
+
+            // 3. Unidentified person (no ID or blank ID card)
+            return c.UnknownJobIcons.Contains(s.JobIcon);
+        }
     }
 
     private static Dictionary<string, SuitSensorStatus> StripSensitiveSensorData(Dictionary<string, SuitSensorStatus> sensors)
