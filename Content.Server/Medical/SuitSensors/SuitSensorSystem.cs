@@ -13,7 +13,7 @@ public sealed class SuitSensorSystem : SharedSuitSensorSystem
     [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly DeviceNetworkSystem _deviceNetworkSystem = default!;
     [Dependency] private readonly SingletonDeviceNetServerSystem _singletonServerSystem = default!;
-    [Dependency] private readonly SharedIdCardSystem _idCardSystem = default!; //SS220-suit-sensor-job-filter
+    [Dependency] private SharedIdCardSystem _idCardSystem = default!; //SS220-suit-sensor-job-filter
 
     public override void Update(float frameTime)
     {

@@ -16,7 +16,7 @@ public sealed class CrewMonitoringConsoleSystem : EntitySystem
 {
     [Dependency] private readonly PowerCellSystem _cell = default!;
     [Dependency] private readonly UserInterfaceSystem _uiSystem = default!;
-    [Dependency] private readonly BlueShieldMonitorSystem _blueShieldMonitor = default!; //SS220-suit-sensor-job-filter
+    [Dependency] private BlueShieldMonitorSystem _blueShieldMonitor = default!; //SS220-suit-sensor-job-filter
 
     public override void Initialize()
     {
