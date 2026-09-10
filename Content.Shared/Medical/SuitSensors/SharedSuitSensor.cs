@@ -7,7 +7,7 @@ namespace Content.Shared.Medical.SuitSensor;
 [Serializable, NetSerializable]
 public sealed class SuitSensorStatus
 {
-    public SuitSensorStatus(NetEntity ownerUid, NetEntity suitSensorUid, string name, string job, string jobIcon, List<string> jobDepartments, string jobPrototypeId, bool isAgentIdCard = false)
+    public SuitSensorStatus(NetEntity ownerUid, NetEntity suitSensorUid, string name, string job, string jobIcon, List<string> jobDepartments, string jobPrototypeId, bool isAgentIdCard = false) //SS220-suit-sensor-job-filter
     {
         OwnerUid = ownerUid;
         SuitSensorUid = suitSensorUid;
@@ -15,10 +15,10 @@ public sealed class SuitSensorStatus
         Job = job;
         JobIcon = jobIcon;
         JobDepartments = jobDepartments;
-        //SS220-new-feature begin
+        //SS220-suit-sensor-job-filter begin
         JobPrototypeId = jobPrototypeId;
         IsAgentIdCard = isAgentIdCard;
-        //SS220-new-feature end
+        //SS220-suit-sensor-job-filter end
     }
 
     public TimeSpan Timestamp;
@@ -26,7 +26,7 @@ public sealed class SuitSensorStatus
     public NetEntity OwnerUid;
     public string Name;
     public string Job;
-    //SS220-new-feature begin
+    //SS220-suit-sensor-job-filter begin
     /// <summary>
     ///     The unlocalized job prototype ID of the person wearing the sensor. Used for server-side filtration.
     ///     Empty string when the ID card has no JobPrototype (e.g. no ID card at all).
@@ -37,7 +37,7 @@ public sealed class SuitSensorStatus
     ///     True if the ID card worn by the person is an Agent ID card. Used to filter out disguised agents.
     /// </summary>
     public bool IsAgentIdCard;
-    //SS220-new-feature end
+    //SS220-suit-sensor-job-filter end
     public string JobIcon;
     public List<string> JobDepartments;
     public bool IsAlive;
@@ -76,10 +76,10 @@ public static class SuitSensorConstants
     public const string NET_OWNER_UID = "ownerUid";
     public const string NET_NAME = "name";
     public const string NET_JOB = "job";
-    //SS220-new-feature begin
+    //SS220-suit-sensor-job-filter begin
     public const string NET_JOB_PROTOTYPE_ID = "jobPrototypeId";
     public const string NET_IS_AGENT_ID_CARD = "isAgentIdCard";
-    //SS220-new-feature end
+    //SS220-suit-sensor-job-filter end
     public const string NET_JOB_ICON = "jobIcon";
     public const string NET_JOB_DEPARTMENTS = "jobDepartments";
     public const string NET_IS_ALIVE = "alive";

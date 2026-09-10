@@ -16,7 +16,7 @@ public sealed class CrewMonitoringConsoleSystem : EntitySystem
 {
     [Dependency] private readonly PowerCellSystem _cell = default!;
     [Dependency] private readonly UserInterfaceSystem _uiSystem = default!;
-    [Dependency] private readonly BlueShieldMonitorSystem _blueShieldMonitor = default!; //SS220-new-feature
+    [Dependency] private readonly BlueShieldMonitorSystem _blueShieldMonitor = default!; //SS220-suit-sensor-job-filter
 
     public override void Initialize()
     {
@@ -45,7 +45,7 @@ public sealed class CrewMonitoringConsoleSystem : EntitySystem
         if (!payload.TryGetValue(SuitSensorConstants.NET_STATUS_COLLECTION, out Dictionary<string, SuitSensorStatus>? sensorStatus))
             return;
 
-        sensorStatus = _blueShieldMonitor.ProcessSensorStatus(uid, sensorStatus); //SS220-new-feature
+        sensorStatus = _blueShieldMonitor.ProcessSensorStatus(uid, sensorStatus); //SS220-suit-sensor-job-filter
 
         component.ConnectedSensors = sensorStatus;
         UpdateUserInterface(uid, component);

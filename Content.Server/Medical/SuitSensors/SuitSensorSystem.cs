@@ -13,7 +13,7 @@ public sealed class SuitSensorSystem : SharedSuitSensorSystem
     [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly DeviceNetworkSystem _deviceNetworkSystem = default!;
     [Dependency] private readonly SingletonDeviceNetServerSystem _singletonServerSystem = default!;
-    [Dependency] private readonly SharedIdCardSystem _idCardSystem = default!; //SS220-new-feature
+    [Dependency] private readonly SharedIdCardSystem _idCardSystem = default!; //SS220-suit-sensor-job-filter
 
     public override void Update(float frameTime)
     {
@@ -41,7 +41,7 @@ public sealed class SuitSensorSystem : SharedSuitSensorSystem
                 continue;
 
             // Check if the ID card is an Agent ID card
-            status.IsAgentIdCard = CheckAgentIdCard(sensor.User); //SS220-new-feature
+            status.IsAgentIdCard = CheckAgentIdCard(sensor.User); //SS220-suit-sensor-job-filter
 
             //Retrieve active server address if the sensor isn't connected to a server
             if (sensor.ConnectedServer == null)
@@ -66,7 +66,7 @@ public sealed class SuitSensorSystem : SharedSuitSensorSystem
         }
     }
 
-    //SS220-new-feature begin
+    //SS220-suit-sensor-job-filter begin
     /// <summary>
     ///     Checks if the user of the sensor is wearing an Agent ID card.
     ///     Returns true if the ID card entity has an AgentIDCardComponent.
@@ -83,5 +83,5 @@ public sealed class SuitSensorSystem : SharedSuitSensorSystem
         // Check if the card entity has AgentIDCardComponent
         return TryComp<AgentIDCardComponent>(card.Owner, out _);
     }
-    //SS220-new-feature end
+    //SS220-suit-sensor-job-filter end
 }
